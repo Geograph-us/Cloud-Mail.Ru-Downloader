@@ -1,5 +1,4 @@
 # Cloud&#64;Mail.Ru Downloader
-***
 
 Многопоточное скачивание из облака [Mail.Ru](http://cloud.mail.ru/) по публичной ссылки. Авторизация в Mail.Ru не требуется.
 
