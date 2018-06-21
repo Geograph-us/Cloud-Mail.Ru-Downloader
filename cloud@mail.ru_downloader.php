@@ -86,6 +86,8 @@
       else
       {
         $fileurl = pathcombine($folder, rawurlencode($item["name"]));
+        // Старые ссылки содержат название файла в id
+        if (strpos($id, $fileurl) !== false) $fileurl = "";
         $cmfiles[] = new CMFile($item["name"],
                                 pathcombine($mainfolder["name"], $item["name"]),
                                 pathcombine($link, $fileurl),
@@ -108,7 +110,7 @@
 
   function GetMainFolder($page)
   {
-    if (preg_match('~"folder":\s+(\{.*?"id":\s+"[^"]+"\s+\})\s+},undefined\)~s', $page, $match)) return json_decode($match[1], true);
+    if (preg_match('~"folder":\s+(\{.*?"id":\s+"[^"]+"\s+\})\s+}~s', $page, $match)) return json_decode($match[1], true);
     else return false;
   }
 
