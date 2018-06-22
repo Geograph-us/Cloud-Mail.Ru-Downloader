@@ -9,6 +9,14 @@
 - Для работы скрипта нужно установить php на компьютер, например отсюда http://windows.php.net/download/ (если уже установлен какой-нибудь Веб-сервер, например, [Denwer](http://www.denwer.ru/) или [OpenServer](http://open-server.ru/), то php от него тоже подойдет).
 - Скрипт тестировался только на PHP версии *5.3.3* под Windows.
 
+## Настройка PHP
+В `php.ini` должно быть активировано openssl-расширение:
+>extension_dir = "ext"\
+>extension=php_openssl.dll
+
+### Видео-пример:
+[![Cloud.MailRu.Downloader Video example](https://img.youtube.com/vi/WnJyXEdEqfI/0.jpg)](https://www.youtube.com/watch?v=WnJyXEdEqfI)
+
 ## Порядок работы
 
 - В файл `links.txt` записать публичные ссылки на скачивание с облака вида https://cloud.mail.ru/public/4A7D/qjuSenWvG по одной на строку.
