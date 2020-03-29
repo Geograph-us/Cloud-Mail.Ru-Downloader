@@ -1,4 +1,7 @@
 # Cloud&#64;Mail.Ru Downloader
+[![GitHub Releases](https://img.shields.io/github/downloads/Geograph-us/Cloud-Mail.Ru-Downloader/total.svg?maxAge=60&style=flat-square)](https://github.com/Geograph-us/Cloud-Mail.Ru-Downloader/releases/latest)
+[![GitHub issues](https://img.shields.io/github/issues/Geograph-us/Cloud-Mail.Ru-Downloader.svg?maxAge=60&style=flat-square)](https://github.com/Geograph-us/Cloud-Mail.Ru-Downloader/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/Geograph-us/Cloud-Mail.Ru-Downloader.svg?maxAge=60&style=flat-square)](https://github.com/Geograph-us/Cloud-Mail.Ru-Downloader/pulls)
 
 Многопоточное скачивание из облака [Mail.Ru](http://cloud.mail.ru/) по публичной ссылки. Авторизация в Mail.Ru не требуется.
 
