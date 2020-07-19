@@ -113,7 +113,7 @@
 	function StartDownload()
 	{
 		global $aria2c, $file4aria;
-		$command = "\"{$aria2c}\" --file-allocation=none --min-tls-version=TLSv1 --max-connection-per-server=10 --split=10 --max-concurrent-downloads=10 --summary-interval=0 --continue --user-agent=\"Mozilla/5.0 (compatible; Firefox/3.6; Linux)\" --input-file=\"{$file4aria}\"";
+		$command = "\"{$aria2c}\" --file-allocation=none --max-connection-per-server=10 --split=10 --max-concurrent-downloads=10 --summary-interval=0 --continue --user-agent=\"Mozilla/5.0 (compatible; Firefox/3.6; Linux)\" --input-file=\"{$file4aria}\"";
 		passthru("{$command}");
 	}
 
