@@ -1,3 +1,8 @@
+# Ссылка на один файла aria2c.exe
 https://cloud.mail.ru/public/LurC/43GhKRx99
+
+# Ссылка на вложенные папки с файлами и русскими буквами в названии
 https://cloud.mail.ru/public/9bFs/gVzxjU5uC
+
+# Ссылка на один файл внутри папки
 https://cloud.mail.ru/public/3umo/mCi4k2ZTs
