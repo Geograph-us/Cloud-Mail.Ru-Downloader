@@ -32,7 +32,7 @@
 
 				file_put_contents($file4aria, $line, FILE_APPEND);
 			}
-			echo "Running Aria2c for download..." . PHP_EOL;
+			echo "Running Aria2c for download " . count($files) . " files..." . PHP_EOL;
 			StartDownload();
 			@unlink($file4aria);
 		}
@@ -66,7 +66,7 @@
 
 	function GetAllFiles($link, $folder = "")
 	{
-		global $base_url, $id;
+		global $base_url, $id, $storage_path, $current_dir;
 
 		$page = get(pathcombine($link, $folder));
 		if ($page === false) { echo "Error $link\r\n"; return false; }
@@ -88,7 +88,9 @@
 					foreach ($files_from_folder as $file)
 					{
 						if ($mainfolder["name"] != "")
-							$file->output = $mainfolder["name"] . "/" . $file->output;
+						{
+							$file->output = $mainfolder["name"] . "/" . windowsbadpath($file->output);
+						}
 					}
 					$cmfiles = array_merge($cmfiles, $files_from_folder);
 				}
@@ -98,8 +100,11 @@
 				$fileurl = pathcombine($folder, rawurlencode($item["name"]));
 				// Старые ссылки содержат название файла в id
 				if (strpos($id, $fileurl) !== false) $fileurl = "";
+				$file_output = windowsbadpath(pathcombine($mainfolder["name"], $item["name"]));
+				$full_path = pathcombine($current_dir, $storage_path, $file_output);
+				if (strlen($full_path) >= 260) die("ERROR: path too long " . strlen($full_path) . " > 260 chars: " . $full_path);
 				$cmfiles[] = new CMFile($item["name"],
-									pathcombine($mainfolder["name"], $item["name"]),
+									$file_output,
 									pathcombine($link, $fileurl),
 									pathcombine($base_url, $id, $fileurl));
 			}
@@ -167,4 +172,15 @@
 	}
 
 	// ======================================================================================================== //
+
+	function windowsbadpath($filename)
+	{
+		$bad = array_merge(
+			array_map('chr', range(0,31)),
+			array("<", ">", ":", '"', "|", "?", "*"));
+		return str_replace($bad, "", $filename);
+	}
+
+	// ======================================================================================================== //
+
 ?>
