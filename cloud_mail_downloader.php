@@ -1,22 +1,20 @@
 <?php
 	$links_file = "links.txt";
 	$storage_path = "downloads";
+
 	$proxy = null;
 	$proxy_auth = null;
 	//$proxy = "u1.p.webshare.io:80";
 	//$proxy = "127.0.0.1:8888";
 	//$proxy_auth = "pdmvzoam-1:hcecmi79o9ot";
 
-	$file4aria = "input.txt";
-	$aria2c = "aria2c";
-	$current_dir = dirname(__FILE__);
+	$delete_input_file_after_download = true;
 
 	// ======================================================================================================== //
 
-	$file4aria = pathcombine($current_dir, $file4aria);
+	$aria2c = "aria2c";
+	$current_dir = dirname(__FILE__);
 	$aria2c = pathcombine($current_dir, $aria2c);
-
-	if (file_exists($file4aria)) unlink($file4aria);
 	$links = file($links_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
 	echo "Start create input file for Aria2c Downloader..." . PHP_EOL;
@@ -24,13 +22,17 @@
 	{
 		$link = trim($link);
 		if(strpos($link, 'http') !== 0) continue;
+
+		$file4aria = pathcombine($current_dir, "input" . time() . ".txt");
+		if (file_exists($file4aria)) unlink($file4aria);
+
 		$base_url = "";
 		$id = "";
 		if($files = GetAllFiles($link))
 		{
 			foreach ($files as $file)
 			{
-				$line = $file->download_link . PHP_EOL;
+				$line = $file->link . PHP_EOL;
 				$line .= "	out=" . $file->output . PHP_EOL;
 				$line .= "	referer=" . $link . PHP_EOL;
 				$line .= "	dir=" . $storage_path . PHP_EOL;
@@ -39,7 +41,7 @@
 			}
 			echo "Running Aria2c for download " . count($files) . " files..." . PHP_EOL;
 			StartDownload();
-			@unlink($file4aria);
+			if ($delete_input_file_after_download) @unlink($file4aria);
 		}
 		else
 		{
@@ -53,17 +55,13 @@
 
 	class CMFile
 	{
-		public $name = "";
-		public $output = "";
 		public $link = "";
-		public $download_link = "";
+		public $output = "";
 
-		function __construct($name, $output, $link, $download_link)
+		function __construct($link, $output)
 		{
-			$this->name = $name;
 			$this->output = $output;
 			$this->link = $link;
-			$this->download_link = $download_link;
 		}
 	}
 
@@ -102,9 +100,7 @@
 			}
 			else
 			{
-				$fileurl = pathcombine($folder, rawurlencode($item["name"]));
-				// Старые ссылки содержат название файла в id. Ссылки на одиночные файлы без папок должны качаться без названия файла
-				if (strpos($id, $fileurl) !== false || $mainfolder["name"] == "") $fileurl = "";
+				$fileurl = $item["weblink"];
 				$file_output = windowsbadpath(pathcombine($mainfolder["name"], $item["name"]));
 				$full_path = pathcombine($current_dir, $storage_path, $file_output);
 
@@ -112,10 +108,7 @@
 				// reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
 				if (strlen($full_path) >= 260) echo "WARNING: path too long " . strlen($full_path) . " > 260 chars: " . $full_path;
 
-				$cmfiles[] = new CMFile($item["name"],
-									$file_output,
-									pathcombine($link, $fileurl),
-									pathcombine($base_url, $id, $fileurl));
+				$cmfiles[] = new CMFile(pathcombine($base_url, $fileurl), $file_output);
 			}
 		}
 
