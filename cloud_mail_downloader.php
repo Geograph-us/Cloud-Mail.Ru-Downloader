@@ -1,6 +1,11 @@
 <?php
 	$links_file = "links.txt";
 	$storage_path = "downloads";
+	$proxy = null;
+	$proxy_auth = null;
+	//$proxy = "u1.p.webshare.io:80";
+	//$proxy = "127.0.0.1:8888";
+	//$proxy_auth = "pdmvzoam-1:hcecmi79o9ot";
 
 	$file4aria = "input.txt";
 	$aria2c = "aria2c";
@@ -38,7 +43,7 @@
 		}
 		else
 		{
-			die("Can't find any file");
+			die("Can't find any file" . PHP_EOL);
 		}
 	}
 
@@ -98,11 +103,15 @@
 			else
 			{
 				$fileurl = pathcombine($folder, rawurlencode($item["name"]));
-				// Старые ссылки содержат название файла в id
-				if (strpos($id, $fileurl) !== false) $fileurl = "";
+				// Старые ссылки содержат название файла в id. Ссылки на одиночные файлы без папок должны качаться без названия файла
+				if (strpos($id, $fileurl) !== false || $mainfolder["name"] == "") $fileurl = "";
 				$file_output = windowsbadpath(pathcombine($mainfolder["name"], $item["name"]));
 				$full_path = pathcombine($current_dir, $storage_path, $file_output);
-				if (strlen($full_path) >= 260) die("ERROR: path too long " . strlen($full_path) . " > 260 chars: " . $full_path);
+
+				// fix for windows 10
+				// reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+				if (strlen($full_path) >= 260) echo "WARNING: path too long " . strlen($full_path) . " > 260 chars: " . $full_path;
+
 				$cmfiles[] = new CMFile($item["name"],
 									$file_output,
 									pathcombine($link, $fileurl),
@@ -117,8 +126,10 @@
 
 	function StartDownload()
 	{
-		global $aria2c, $file4aria;
-		$command = "\"{$aria2c}\" --file-allocation=none --max-connection-per-server=10 --split=10 --max-concurrent-downloads=10 --summary-interval=0 --continue --user-agent=\"Mozilla/5.0 (compatible; Firefox/3.6; Linux)\" --input-file=\"{$file4aria}\"";
+		global $aria2c, $file4aria, $proxy, $proxy_auth;
+
+		$command = "\"$aria2c\" --file-allocation=none --max-connection-per-server=10 --split=10 --max-concurrent-downloads=10 --summary-interval=0 --continue --user-agent=\"Mozilla/5.0 (compatible; Firefox/3.6; Linux)\" --input-file=\"$file4aria\"";
+		if ($proxy) $command .= " --all-proxy=" . ($proxy_auth ? "$proxy_auth@" : "") . "$proxy";
 		passthru("{$command}");
 	}
 
@@ -145,11 +156,17 @@
 
 	function get($url)
 	{
-		$proxy = null; //"127.0.0.1:8888";
+		global $proxy, $proxy_auth;
 
 		$http["method"] = "GET";
 		if ($proxy) { $http["proxy"] = "tcp://" . $proxy; $http["request_fulluri"] = true; }
+		if ($proxy_auth) $http["header"] = "Proxy-Authorization: Basic " . base64_encode($proxy_auth);
 		$options['http'] = $http;
+		$options['ssl'] = array
+		(
+			'verify_peer' => false,
+			'verify_peer_name' => false
+		);
 		$context = stream_context_create($options);
 		$body = @file_get_contents($url, NULL, $context);
 		return $body;
