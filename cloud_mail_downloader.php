@@ -1,6 +1,6 @@
 <?php
 	$links_file = "links.txt";
-	$storage_path = "downloads";
+	$download_to_folder = "downloads";
 
 	$proxy = null;
 	$proxy_auth = null;
@@ -27,7 +27,6 @@
 		if (file_exists($file4aria)) unlink($file4aria);
 
 		$base_url = "";
-		$id = "";
 		if($files = GetAllFiles($link))
 		{
 			foreach ($files as $file)
@@ -35,7 +34,7 @@
 				$line = $file->link . PHP_EOL;
 				$line .= "	out=" . $file->output . PHP_EOL;
 				$line .= "	referer=" . $link . PHP_EOL;
-				$line .= "	dir=" . $storage_path . PHP_EOL;
+				$line .= "	dir=" . $download_to_folder . PHP_EOL;
 
 				file_put_contents($file4aria, $line, FILE_APPEND);
 			}
@@ -69,14 +68,13 @@
 
 	function GetAllFiles($link, $folder = "")
 	{
-		global $base_url, $id, $storage_path, $current_dir;
+		global $base_url, $download_to_folder, $current_dir;
 
 		$page = get(pathcombine($link, $folder));
 		if ($page === false) { echo "Error $link\r\n"; return false; }
 		if (($mainfolder = GetMainFolder($page)) == false) { echo "Cannot get main folder $link\r\n"; return false; }
 
 		if (!$base_url) $base_url = GetBaseUrl($page);
-		if (!$id && preg_match('~\/public\/(.*)~', $link, $match)) $id = $match[1];
 
 		$cmfiles = array();
 		if ($mainfolder["name"] == "/") $mainfolder["name"] = "";
@@ -102,7 +100,7 @@
 			{
 				$fileurl = $item["weblink"];
 				$file_output = windowsbadpath(pathcombine($mainfolder["name"], $item["name"]));
-				$full_path = pathcombine($current_dir, $storage_path, $file_output);
+				$full_path = pathcombine($current_dir, $download_to_folder, $file_output);
 
 				// fix for windows 10
 				// reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
