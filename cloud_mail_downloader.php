@@ -111,7 +111,7 @@
 	function GetPageId($url)
 	{
 		$page = get($url);
-		if (preg_match('~pageId:"([^"]+)"~s', $page, $match)) return $match[1];
+		if (preg_match('~"pageId":"([^"]+)"~s', $page, $match)) return $match[1];
 		return false;
 	}
 
